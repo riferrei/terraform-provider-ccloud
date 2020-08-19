@@ -1,4 +1,4 @@
 provider "ccloud" {
-  username = "ricardo@confluent.io"
-  password = "TempPwd2020"
+  username = "<YOUR_CCLOUD_USERNAME>"
+  password = "<YOUR_CCLOUD_PASSWORD>"
 }
