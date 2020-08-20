@@ -1,4 +1,12 @@
+variable "ccloud_username" {
+  type = string
+}
+
+variable "ccloud_password" {
+  type = string
+}
+
 provider "ccloud" {
-  username = "<YOUR_CCLOUD_USERNAME>"
-  password = "<YOUR_CCLOUD_PASSWORD>"
+  username = var.ccloud_username
+  password = var.ccloud_password
 }
