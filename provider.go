@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	ccloudapi "github.com/riferrei/ccloud-sdk-go"
@@ -17,20 +18,16 @@ func Provider() *schema.Provider {
 			"username": {
 				Type:     schema.TypeString,
 				Required: true,
-				ValidateFunc: func(v interface{}, k string) (wrs []string, ers []error) {
-					var errors []error
-					var warns []string
-					return warns, errors
+				ValidateDiagFunc: func(interface{}, cty.Path) diag.Diagnostics {
+					return nil
 				},
 			},
 			"password": {
 				Type:      schema.TypeString,
 				Required:  true,
 				Sensitive: true,
-				ValidateFunc: func(v interface{}, k string) (wrs []string, ers []error) {
-					var errors []error
-					var warns []string
-					return warns, errors
+				ValidateDiagFunc: func(interface{}, cty.Path) diag.Diagnostics {
+					return nil
 				},
 			},
 		},
