@@ -1,10 +1,9 @@
-package ccloud
+package main
 
 import (
-	"strconv"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/riferrei/terraform-provider-ccloud/ccloudapi"
+	"github.com/riferrei/ccloud-sdk-go"
+	"strconv"
 )
 
 func resourceAPIKey() *schema.Resource {

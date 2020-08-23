@@ -1,11 +1,11 @@
-package ccloud
+package main
 
 import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/riferrei/terraform-provider-ccloud/ccloudapi"
+	ccloudapi "github.com/riferrei/ccloud-sdk-go"
 )
 
 // Provider returns an instance of the
@@ -17,11 +17,21 @@ func Provider() *schema.Provider {
 			"username": {
 				Type:     schema.TypeString,
 				Required: true,
+				ValidateFunc: func(v interface{}, k string) (wrs []string, ers []error) {
+					var errors []error
+					var warns []string
+					return warns, errors
+				},
 			},
 			"password": {
 				Type:      schema.TypeString,
 				Required:  true,
 				Sensitive: true,
+				ValidateFunc: func(v interface{}, k string) (wrs []string, ers []error) {
+					var errors []error
+					var warns []string
+					return warns, errors
+				},
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{

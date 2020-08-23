@@ -1,8 +1,8 @@
-package ccloud
+package main
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/riferrei/terraform-provider-ccloud/ccloudapi"
+	"github.com/riferrei/ccloud-sdk-go"
 )
 
 func resourceEnvironment() *schema.Resource {

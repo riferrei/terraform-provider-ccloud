@@ -1,11 +1,11 @@
-package ccloud
+package main
 
 import (
 	"fmt"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/riferrei/terraform-provider-ccloud/ccloudapi"
+	ccloudapi "github.com/riferrei/ccloud-sdk-go"
 )
 
 const (
@@ -15,43 +15,57 @@ const (
 )
 
 var (
-	selectedCloudProvider string
-	cloudProviders        = []string{"aws", "gcp", "azure"}
-	cloudRegions          = map[string][]string{
-		cloudProviders[0]: { // -----> AWS
-			"ap-northeast-1",
-			"ap-south-1",
+	cloudProviders = map[string][]string{
+		"aws": {
 			"ap-southeast-1",
-			"ap-southeast-2",
-			"ca-central-1",
 			"eu-central-1",
-			"eu-west-1",
+			"ap-northeast-1",
+			"eu-west-3",
 			"eu-west-2",
+			"us-west-2",
+			"eu-west-1",
 			"us-east-1",
+			"ca-central-1",
 			"us-east-2",
+			"ap-southeast-2",
+			"ap-south-1",
 			"us-west-1",
-			"us-west-2"},
-		cloudProviders[1]: { // -----> GCP
-			"asia-east2",
-			"asia-northeast1",
+			"sa-east-1"},
+		"gcp": {
+			"northamerica-northeast1",
+			"southamerica-east1",
+			"asia-southeast2",
+			"us-west4",
 			"asia-southeast1",
-			"australia-southeast1",
-			"europe-north1",
-			"europe-west1",
-			"europe-west2",
 			"europe-west3",
-			"europe-west4",
+			"australia-southeast1",
 			"us-central1",
-			"us-east1",
-			"us-east4",
 			"us-west1",
-			"us-west2"},
-		cloudProviders[2]: { // -----> Azure
-			"southeastasia",
+			"asia-northeast1",
+			"us-west2",
+			"europe-north1",
+			"europe-west4",
+			"us-east4",
+			"asia-east2",
+			"europe-west1",
+			"asia-east1",
+			"europe-west2",
+			"us-east1"},
+		"azure": {
+			"australiaeast",
+			"francecentral",
+			"canadacentral",
+			"eastus",
+			"uksouth",
+			"westus2",
 			"westeurope",
-			"westus2"},
+			"centralus",
+			"eastus2",
+			"northeurope",
+			"southeastasia"},
 	}
-	durabilityOptions = []string{"LOW", "HIGH"}
+	selectedCloudProvider string
+	durabilityOptions     = []string{"LOW", "HIGH"}
 )
 
 func resourceCluster() *schema.Resource {
@@ -79,17 +93,21 @@ func resourceCluster() *schema.Resource {
 					var warns []string
 					value, _ := v.(string)
 					validProvider := false
-					for _, cloudProvider := range cloudProviders {
-						if value == cloudProvider {
+					for provider := range cloudProviders {
+						if value == provider {
 							validProvider = true
 							selectedCloudProvider = value
 							break
 						}
 					}
 					if !validProvider {
+						providers := []string{}
+						for provider := range cloudProviders {
+							providers = append(providers, provider)
+						}
 						errors = append(errors, fmt.Errorf("Invalid value for "+
 							"cloud provider. Valid values are: "+
-							strings.Join(cloudProviders, ", ")))
+							strings.Join(providers, ", ")))
 						return warns, errors
 					}
 					return warns, errors
@@ -105,8 +123,8 @@ func resourceCluster() *schema.Resource {
 					if len(selectedCloudProvider) > 0 {
 						value, _ := v.(string)
 						validRegion := false
-						availableRegions := cloudRegions[selectedCloudProvider]
-						for _, cloudRegion := range availableRegions {
+						cloudRegions := cloudProviders[selectedCloudProvider]
+						for _, cloudRegion := range cloudRegions {
 							if value == cloudRegion {
 								validRegion = true
 								break
@@ -115,7 +133,7 @@ func resourceCluster() *schema.Resource {
 						if !validRegion {
 							errors = append(errors, fmt.Errorf("Invalid value for "+
 								"cloud region. Valid values are: "+
-								strings.Join(availableRegions, ", ")))
+								strings.Join(cloudRegions, ", ")))
 							return warns, errors
 						}
 					}
