@@ -155,3 +155,20 @@ type InternalError struct {
 type ErrorResponse struct {
 	Error InternalError `json:"error"`
 }
+
+// CloudRegion type
+type CloudRegion struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// CloudProvider type
+type CloudProvider struct {
+	ID      string         `json:"id"`
+	Regions []*CloudRegion `json:"regions"`
+}
+
+// EnvironmentMetadataResponse type
+type EnvironmentMetadataResponse struct {
+	CloudProviders []*CloudProvider `json:"clouds"`
+}

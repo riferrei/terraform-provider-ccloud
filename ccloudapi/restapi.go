@@ -14,6 +14,7 @@ import (
 const (
 	ccloudAPI       = "https://confluent.cloud/api"
 	loginURI        = "/sessions"
+	envMetadataURI  = "/env_metadata"
 	environmentsURI = "/accounts"
 	clustersURI     = "/clusters"
 	apiKeysURI      = "/api_keys"
@@ -43,6 +44,21 @@ func Login(username, password string) (*Session, error) {
 		AuthToken: loginResponse.AuthToken,
 		User:      loginResponse.User,
 	}, nil
+}
+
+// GetEnvironmentMetadata Retrieve the last update from the metadata
+func GetEnvironmentMetadata(session *Session) ([]*CloudProvider, error) {
+	uri := envMetadataURI
+	statusCode, resp, err := httpRequest(session, "GET", uri, "application/json", nil)
+	if err != nil || statusCode == 404 {
+		return nil, err
+	}
+	envMetadataResponse := new(EnvironmentMetadataResponse)
+	err = json.Unmarshal(resp, &envMetadataResponse)
+	if err != nil {
+		return nil, err
+	}
+	return envMetadataResponse.CloudProviders, nil
 }
 
 // CreateEnvironment creates a new environment
