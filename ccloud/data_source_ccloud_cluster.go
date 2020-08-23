@@ -9,55 +9,55 @@ func dataSourceCluster() *schema.Resource {
 	return &schema.Resource{
 		Read: dataSourceClusterRead,
 		Schema: map[string]*schema.Schema{
-			"environment_id": &schema.Schema{
+			"environment_id": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"cloud_provider": &schema.Schema{
+			"cloud_provider": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"cloud_region": &schema.Schema{
+			"cloud_region": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"network_ingress": &schema.Schema{
+			"network_ingress": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
-			"network_egress": &schema.Schema{
+			"network_egress": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
-			"storage": &schema.Schema{
+			"storage": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
-			"durability": &schema.Schema{
+			"durability": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"organization_id": &schema.Schema{
+			"organization_id": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
-			"cluster_endpoint": &schema.Schema{
+			"cluster_endpoint": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"api_endpoint": &schema.Schema{
+			"api_endpoint": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,

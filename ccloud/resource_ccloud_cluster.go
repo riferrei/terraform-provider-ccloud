@@ -18,7 +18,7 @@ var (
 	selectedCloudProvider string
 	cloudProviders        = []string{"aws", "gcp", "azure"}
 	cloudRegions          = map[string][]string{
-		cloudProviders[0]: []string{ // -----> AWS
+		cloudProviders[0]: { // -----> AWS
 			"ap-northeast-1",
 			"ap-south-1",
 			"ap-southeast-1",
@@ -31,7 +31,7 @@ var (
 			"us-east-2",
 			"us-west-1",
 			"us-west-2"},
-		cloudProviders[1]: []string{ // -----> GCP
+		cloudProviders[1]: { // -----> GCP
 			"asia-east2",
 			"asia-northeast1",
 			"asia-southeast1",
@@ -46,7 +46,7 @@ var (
 			"us-east4",
 			"us-west1",
 			"us-west2"},
-		cloudProviders[2]: []string{ // -----> Azure
+		cloudProviders[2]: { // -----> Azure
 			"southeastasia",
 			"westeurope",
 			"westus2"},
@@ -61,16 +61,16 @@ func resourceCluster() *schema.Resource {
 		Update: clusterUpdate,
 		Delete: clusterDelete,
 		Schema: map[string]*schema.Schema{
-			"environment_id": &schema.Schema{
+			"environment_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"cloud_provider": &schema.Schema{
+			"cloud_provider": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -95,7 +95,7 @@ func resourceCluster() *schema.Resource {
 					return warns, errors
 				},
 			},
-			"cloud_region": &schema.Schema{
+			"cloud_region": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -122,7 +122,7 @@ func resourceCluster() *schema.Resource {
 					return warns, errors
 				},
 			},
-			"network_ingress": &schema.Schema{
+			"network_ingress": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true,
@@ -140,7 +140,7 @@ func resourceCluster() *schema.Resource {
 					return warns, errors
 				},
 			},
-			"network_egress": &schema.Schema{
+			"network_egress": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true,
@@ -158,7 +158,7 @@ func resourceCluster() *schema.Resource {
 					return warns, errors
 				},
 			},
-			"storage": &schema.Schema{
+			"storage": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true,
@@ -176,7 +176,7 @@ func resourceCluster() *schema.Resource {
 					return warnings, errors
 				},
 			},
-			"durability": &schema.Schema{
+			"durability": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -201,17 +201,17 @@ func resourceCluster() *schema.Resource {
 					return warns, errors
 				},
 			},
-			"organization_id": &schema.Schema{
+			"organization_id": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
-			"cluster_endpoint": &schema.Schema{
+			"cluster_endpoint": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"api_endpoint": &schema.Schema{
+			"api_endpoint": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,

@@ -14,22 +14,22 @@ func resourceAPIKey() *schema.Resource {
 		Update: apiKeyUpdate,
 		Delete: apiKeyDelete,
 		Schema: map[string]*schema.Schema{
-			"environment_id": &schema.Schema{
+			"environment_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"cluster_id": &schema.Schema{
+			"cluster_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"key": &schema.Schema{
+			"key": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"secret": &schema.Schema{
+			"secret": {
 				Type:      schema.TypeString,
 				Optional:  true,
 				Computed:  true,

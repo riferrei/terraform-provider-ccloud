@@ -12,11 +12,11 @@ func resourceEnvironment() *schema.Resource {
 		Update: environmentUpdate,
 		Delete: environmentDelete,
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"organization_id": &schema.Schema{
+			"organization_id": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
