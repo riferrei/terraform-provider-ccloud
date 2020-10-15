@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	ccloudapi "github.com/riferrei/ccloud-sdk-go"
 )
@@ -70,10 +72,10 @@ var (
 
 func resourceCluster() *schema.Resource {
 	return &schema.Resource{
-		Create: clusterCreate,
-		Read:   clusterRead,
-		Update: clusterUpdate,
-		Delete: clusterDelete,
+		CreateContext: clusterCreate,
+		ReadContext:   clusterRead,
+		UpdateContext: clusterUpdate,
+		DeleteContext: clusterDelete,
 		Schema: map[string]*schema.Schema{
 			"environment_id": {
 				Type:     schema.TypeString,
@@ -238,7 +240,8 @@ func resourceCluster() *schema.Resource {
 	}
 }
 
-func clusterCreate(data *schema.ResourceData, meta interface{}) error {
+func clusterCreate(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	session := meta.(*ccloudapi.Session)
 	cluster := &ccloudapi.Cluster{
 		EnvironmentID:  data.Get("environment_id").(string),
@@ -252,7 +255,7 @@ func clusterCreate(data *schema.ResourceData, meta interface{}) error {
 	}
 	createdCluster, err := ccloudapi.CreateCluster(cluster, session)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	data.SetId(createdCluster.ID)
 	data.Set("environment_id", createdCluster.EnvironmentID)
@@ -266,14 +269,18 @@ func clusterCreate(data *schema.ResourceData, meta interface{}) error {
 	data.Set("organization_id", createdCluster.OrganizationID)
 	data.Set("cluster_endpoint", createdCluster.ClusterEndpoint)
 	data.Set("api_endpoint", createdCluster.APIEndpoint)
-	return nil
+	return diags
 }
 
-func clusterRead(data *schema.ResourceData, meta interface{}) error {
+func clusterRead(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	id := data.Id()
 	environmentID := data.Get("environment_id").(string)
 	session := meta.(*ccloudapi.Session)
-	cluster, _ := ccloudapi.ReadCluster(id, environmentID, session)
+	cluster, err := ccloudapi.ReadCluster(id, environmentID, session)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	if cluster == nil {
 		data.SetId("")
 		return nil
@@ -289,10 +296,10 @@ func clusterRead(data *schema.ResourceData, meta interface{}) error {
 	data.Set("organization_id", cluster.OrganizationID)
 	data.Set("cluster_endpoint", cluster.ClusterEndpoint)
 	data.Set("api_endpoint", cluster.APIEndpoint)
-	return nil
+	return diags
 }
 
-func clusterUpdate(data *schema.ResourceData, meta interface{}) error {
+func clusterUpdate(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	cluster := &ccloudapi.Cluster{
 		ID:             data.Id(),
 		EnvironmentID:  data.Get("environment_id").(string),
@@ -306,11 +313,15 @@ func clusterUpdate(data *schema.ResourceData, meta interface{}) error {
 		OrganizationID: data.Get("organization_id").(int),
 	}
 	session := meta.(*ccloudapi.Session)
-	ccloudapi.UpdateCluster(cluster, session)
-	return clusterRead(data, meta)
+	_, err := ccloudapi.UpdateCluster(cluster, session)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	return clusterRead(ctx, data, meta)
 }
 
-func clusterDelete(data *schema.ResourceData, meta interface{}) error {
+func clusterDelete(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	cluster := &ccloudapi.Cluster{
 		ID:             data.Id(),
 		EnvironmentID:  data.Get("environment_id").(string),
@@ -324,7 +335,10 @@ func clusterDelete(data *schema.ResourceData, meta interface{}) error {
 		OrganizationID: data.Get("organization_id").(int),
 	}
 	session := meta.(*ccloudapi.Session)
-	ccloudapi.DeleteCluster(cluster, session)
+	_, err := ccloudapi.DeleteCluster(cluster, session)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	data.SetId("")
-	return nil
+	return diags
 }

@@ -1,16 +1,19 @@
 package main
 
 import (
+	"context"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/riferrei/ccloud-sdk-go"
+	ccloudapi "github.com/riferrei/ccloud-sdk-go"
 )
 
 func resourceEnvironment() *schema.Resource {
 	return &schema.Resource{
-		Create: environmentCreate,
-		Read:   environmentRead,
-		Update: environmentUpdate,
-		Delete: environmentDelete,
+		CreateContext: environmentCreate,
+		ReadContext:   environmentRead,
+		UpdateContext: environmentUpdate,
+		DeleteContext: environmentDelete,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -25,7 +28,8 @@ func resourceEnvironment() *schema.Resource {
 	}
 }
 
-func environmentCreate(data *schema.ResourceData, meta interface{}) error {
+func environmentCreate(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	session := meta.(*ccloudapi.Session)
 	environment := &ccloudapi.Environment{
 		OrganizationID: session.User.OrganizationID,
@@ -33,28 +37,29 @@ func environmentCreate(data *schema.ResourceData, meta interface{}) error {
 	}
 	createdEnvironment, err := ccloudapi.CreateEnvironment(environment, session)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	data.SetId(createdEnvironment.ID)
 	data.Set("name", createdEnvironment.Name)
 	data.Set("organization_id", createdEnvironment.OrganizationID)
-	return nil
+	return diags
 }
 
-func environmentRead(data *schema.ResourceData, meta interface{}) error {
+func environmentRead(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	id := data.Id()
 	session := meta.(*ccloudapi.Session)
 	environment, _ := ccloudapi.ReadEnvironment(id, session)
 	if environment == nil {
 		data.SetId("")
-		return nil
+		return diags
 	}
 	data.Set("name", environment.Name)
 	data.Set("organization_id", environment.OrganizationID)
-	return nil
+	return diags
 }
 
-func environmentUpdate(data *schema.ResourceData, meta interface{}) error {
+func environmentUpdate(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	environment := &ccloudapi.Environment{
 		ID:             data.Id(),
 		Name:           data.Get("name").(string),
@@ -62,10 +67,11 @@ func environmentUpdate(data *schema.ResourceData, meta interface{}) error {
 	}
 	session := meta.(*ccloudapi.Session)
 	ccloudapi.UpdateEnvironment(environment, session)
-	return environmentRead(data, meta)
+	return environmentRead(ctx, data, meta)
 }
 
-func environmentDelete(data *schema.ResourceData, meta interface{}) error {
+func environmentDelete(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	environment := &ccloudapi.Environment{
 		ID:             data.Id(),
 		Name:           data.Get("name").(string),
@@ -74,5 +80,5 @@ func environmentDelete(data *schema.ResourceData, meta interface{}) error {
 	session := meta.(*ccloudapi.Session)
 	ccloudapi.DeleteEnvironment(environment, session)
 	data.SetId("")
-	return nil
+	return diags
 }

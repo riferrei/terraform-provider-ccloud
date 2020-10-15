@@ -1,13 +1,16 @@
 package main
 
 import (
+	"context"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/riferrei/ccloud-sdk-go"
+	ccloudapi "github.com/riferrei/ccloud-sdk-go"
 )
 
 func dataSourceCluster() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceClusterRead,
+		ReadContext: dataSourceClusterRead,
 		Schema: map[string]*schema.Schema{
 			"environment_id": {
 				Type:     schema.TypeString,
@@ -66,13 +69,14 @@ func dataSourceCluster() *schema.Resource {
 	}
 }
 
-func dataSourceClusterRead(data *schema.ResourceData, meta interface{}) error {
+func dataSourceClusterRead(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	session := meta.(*ccloudapi.Session)
 	name := data.Get("name").(string)
 	environmentID := data.Get("environment_id").(string)
 	clusters, err := ccloudapi.ListClusters(environmentID, session)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if len(clusters) > 0 {
 		for _, cluster := range clusters {
@@ -93,5 +97,5 @@ func dataSourceClusterRead(data *schema.ResourceData, meta interface{}) error {
 			}
 		}
 	}
-	return nil
+	return diags
 }
